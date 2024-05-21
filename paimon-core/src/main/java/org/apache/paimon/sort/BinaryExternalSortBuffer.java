@@ -189,15 +189,20 @@ public class BinaryExternalSortBuffer implements SortBuffer {
     @Override
     public boolean write(InternalRow record) throws IOException {
         while (true) {
+            // 写内存中 ，并判断是否成功
+            // 需要排序
+            // inMemorySortBuffer 是传入进来的
             boolean success = inMemorySortBuffer.write(record);
             if (success) {
                 this.numRecords++;
                 return true;
             }
+            // 如果不成功
             if (inMemorySortBuffer.isEmpty()) {
                 // did not fit in a fresh buffer, must be large...
                 throw new IOException("The record exceeds the maximum size of a sort buffer.");
             } else {
+                // 写磁盘
                 spill();
 
                 if (spillChannelIDs.size() >= maxNumFileHandles) {

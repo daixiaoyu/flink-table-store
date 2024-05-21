@@ -91,7 +91,7 @@ public abstract class TableWriteOperator<IN> extends PrepareCommitOperator<IN, C
         // We put state and write init in this method for convenient testing. Without construct a
         // runtime context, we can test to construct a writer here
         state = new StoreSinkWriteState(context, stateFilter);
-
+        // 这里就是调用传入进来的 storeSinkWriteProvider 来创建 write
         write =
                 storeSinkWriteProvider.provide(
                         table, commitUser, state, ioManager, memoryPool, getMetricGroup());

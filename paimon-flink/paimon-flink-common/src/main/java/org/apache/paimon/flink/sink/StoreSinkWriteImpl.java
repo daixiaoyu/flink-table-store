@@ -131,6 +131,7 @@ public class StoreSinkWriteImpl implements StoreSinkWrite {
         this.memoryPool = memoryPool;
         this.memoryPoolFactory = memoryPoolFactory;
         this.metricGroup = metricGroup;
+        // 创建 TableWriteImpl
         this.write = newTableWrite(table);
     }
 
@@ -138,7 +139,7 @@ public class StoreSinkWriteImpl implements StoreSinkWrite {
         checkArgument(
                 !(memoryPool != null && memoryPoolFactory != null),
                 "memoryPool and memoryPoolFactory cannot be set at the same time.");
-
+        // 创建 TableWriteImpl 内部的一个 write
         TableWriteImpl<?> tableWrite =
                 table.newWrite(
                                 commitUser,
@@ -172,6 +173,7 @@ public class StoreSinkWriteImpl implements StoreSinkWrite {
     @Override
     @Nullable
     public SinkRecord write(InternalRow rowData) throws Exception {
+        // TableWriteImpl.writeAndReturn
         return write.writeAndReturn(rowData);
     }
 

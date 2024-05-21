@@ -173,6 +173,7 @@ public class BinaryInMemorySortBuffer extends BinaryIndexedSortable implements S
         // serialize the record into the data buffers
         int skip;
         try {
+            // 这里是序列化，获取序列化之后的长度
             skip = this.inputSerializer.serializeToPages(record, this.recordCollector);
         } catch (EOFException e) {
             return false;

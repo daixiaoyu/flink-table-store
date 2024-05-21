@@ -95,6 +95,7 @@ public abstract class FlinkSink<T> implements Serializable {
 
         boolean waitCompaction;
         if (table.coreOptions().writeOnly()) {
+            // 不合并
             waitCompaction = false;
         } else {
             Options options = table.coreOptions().toConfiguration();
@@ -114,6 +115,7 @@ public abstract class FlinkSink<T> implements Serializable {
 
             if (changelogProducer == ChangelogProducer.FULL_COMPACTION || deltaCommits >= 0) {
                 int finalDeltaCommits = Math.max(deltaCommits, 1);
+                // fullCompaction 的写法
                 return (table, commitUser, state, ioManager, memoryPool, metricGroup) -> {
                     assertNoSinkMaterializer.run();
                     return new GlobalFullCompactionSinkWrite(
@@ -190,6 +192,8 @@ public abstract class FlinkSink<T> implements Serializable {
         boolean isStreaming = isStreaming(input);
 
         boolean writeOnly = table.coreOptions().writeOnly();
+        //
+        //  CdcFixedBucketSink.createWriteOperator()
         SingleOutputStreamOperator<Committable> written =
                 input.transform(
                                 (writeOnly ? WRITER_WRITE_ONLY_NAME : WRITER_NAME)
@@ -216,6 +220,7 @@ public abstract class FlinkSink<T> implements Serializable {
     }
 
     protected DataStreamSink<?> doCommit(DataStream<Committable> written, String commitUser) {
+        // 这里就是去处理 commit 提交的过程
         StreamExecutionEnvironment env = written.getExecutionEnvironment();
         ReadableConfig conf = env.getConfiguration();
         CheckpointConfig checkpointConfig = env.getCheckpointConfig();

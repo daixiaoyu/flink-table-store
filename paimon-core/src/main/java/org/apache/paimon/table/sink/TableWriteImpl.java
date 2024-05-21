@@ -59,6 +59,8 @@ public class TableWriteImpl<T> implements InnerTableWrite, Restorable<List<State
             KeyAndBucketExtractor<InternalRow> keyAndBucketExtractor,
             RecordExtractor<T> recordExtractor,
             boolean ignoreDelete) {
+        // FileStoreWrite 设置
+        // write = KeyValueFileStoreWrite
         this.write = write;
         this.keyAndBucketExtractor = keyAndBucketExtractor;
         this.recordExtractor = recordExtractor;
@@ -132,6 +134,8 @@ public class TableWriteImpl<T> implements InnerTableWrite, Restorable<List<State
             return null;
         }
         SinkRecord record = toSinkRecord(row);
+        // FileStoreWrite.write
+        // -> AbstractFileStoreWrite.write
         write.write(record.partition(), record.bucket(), recordExtractor.extract(record));
         return record;
     }

@@ -95,11 +95,12 @@ public class CdcSinkBuilder<T> {
         }
 
         FileStoreTable dataTable = (FileStoreTable) table;
-
+        // parsed 转换过后的 DataStream<CdcRecord>
         SingleOutputStreamOperator<CdcRecord> parsed =
                 input.forward()
                         .process(new CdcParsingProcessFunction<>(parserFactory))
-                        .setParallelism(input.getParallelism());
+                        .setParallelism(input.getParallelism())
+                        .name("");
 
         DataStream<Void> schemaChangeProcessFunction =
                 SingleOutputStreamOperatorUtils.getSideOutput(
@@ -108,15 +109,18 @@ public class CdcSinkBuilder<T> {
                                 new UpdatedDataFieldsProcessFunction(
                                         new SchemaManager(dataTable.fileIO(), dataTable.location()),
                                         identifier,
-                                        catalogLoader));
+                                        catalogLoader))
+                        .name("UpdateDataField");
         schemaChangeProcessFunction.getTransformation().setParallelism(1);
         schemaChangeProcessFunction.getTransformation().setMaxParallelism(1);
 
         BucketMode bucketMode = dataTable.bucketMode();
         switch (bucketMode) {
             case FIXED:
+                //
                 return buildForFixedBucket(parsed);
             case DYNAMIC:
+                // 动态Bucket
                 return new CdcDynamicBucketSink((FileStoreTable) table).build(parsed, parallelism);
             case UNAWARE:
                 return buildForUnawareBucket(parsed);

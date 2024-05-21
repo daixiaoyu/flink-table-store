@@ -128,6 +128,7 @@ public class SortBufferWriteBuffer implements WriteBuffer {
     @Override
     public boolean put(long sequenceNumber, RowKind valueKind, InternalRow key, InternalRow value)
             throws IOException {
+        // BinaryExternalSortBuffer.write()
         return buffer.write(serializer.toRow(key, sequenceNumber, valueKind, value));
     }
 

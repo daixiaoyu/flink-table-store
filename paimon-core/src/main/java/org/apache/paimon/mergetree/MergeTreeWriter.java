@@ -141,6 +141,7 @@ public class MergeTreeWriter implements RecordWriter<KeyValue>, MemoryOwner {
 
     @Override
     public void setMemoryPool(MemorySegmentPool memoryPool) {
+        // 创建 writeBuffer ，这里其实就是内存管理部分
         this.writeBuffer =
                 new SortBufferWriteBuffer(
                         keyType,
@@ -160,6 +161,7 @@ public class MergeTreeWriter implements RecordWriter<KeyValue>, MemoryOwner {
         boolean success = writeBuffer.put(sequenceNumber, kv.valueKind(), kv.key(), kv.value());
         if (!success) {
             flushWriteBuffer(false, false);
+            // SortBufferWriteBuffer.put
             success = writeBuffer.put(sequenceNumber, kv.valueKind(), kv.key(), kv.value());
             if (!success) {
                 throw new RuntimeException("Mem table is too small to hold a single element.");

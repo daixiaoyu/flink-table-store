@@ -27,6 +27,7 @@ import org.apache.flink.streaming.api.transformations.PartitionTransformation;
 import org.apache.flink.streaming.runtime.partitioner.StreamPartitioner;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 
+// StreamPartitioner is Flink API
 /** A {@link StreamPartitioner} which wraps a {@link ChannelComputer}. */
 public class FlinkStreamPartitioner<T> extends StreamPartitioner<T> {
 
@@ -44,6 +45,10 @@ public class FlinkStreamPartitioner<T> extends StreamPartitioner<T> {
 
     @Override
     public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
+        // extend the Flink API ChannelSelector
+        // 核心是调用的 channelComputer.channel 来决定分流去哪里
+
+        // -> CdcFixedBucketChannelComputerBase
         return channelComputer.channel(record.getInstance().getValue());
     }
 

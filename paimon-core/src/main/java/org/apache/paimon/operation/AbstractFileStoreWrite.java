@@ -123,6 +123,8 @@ public abstract class AbstractFileStoreWrite<T> implements FileStoreWrite<T> {
     @Override
     public void write(BinaryRow partition, int bucket, T data) throws Exception {
         WriterContainer<T> container = getWriterWrapper(partition, bucket);
+        // writer =  RecordWriter
+        // MergeTreeWriter.write(data)
         container.writer.write(data);
         if (container.indexMaintainer != null) {
             container.indexMaintainer.notifyNewRecord(data);

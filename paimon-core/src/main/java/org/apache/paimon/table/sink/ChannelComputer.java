@@ -34,6 +34,7 @@ public interface ChannelComputer<T> extends Serializable {
 
     int channel(T record);
 
+    // 这里就是确定分区分流的地方，一个具体算法
     static int select(BinaryRow partition, int bucket, int numChannels) {
         int startChannel = Math.abs(partition.hashCode()) % numChannels;
         return (startChannel + bucket) % numChannels;
